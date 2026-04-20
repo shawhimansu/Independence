@@ -1,0 +1,198 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+<title>India Independence Day Quiz</title>
+<style>
+  * { box-sizing: border-box; margin: 0; padding: 0; }
+  body { font-family: 'Segoe UI', Arial, sans-serif; background: #f5f5f0; min-height: 100vh; display: flex; align-items: center; justify-content: center; padding: 1.5rem; }
+  .container { max-width: 620px; width: 100%; }
+
+  .flag-bar { display: flex; gap: 6px; margin-bottom: 1.25rem; }
+  .flag-seg { height: 10px; border-radius: 4px; flex: 1; }
+
+  .header-row { display: flex; justify-content: space-between; align-items: center; margin-bottom: 0.4rem; }
+  .q-label { font-size: 13px; color: #666; }
+  .score-live { font-size: 13px; color: #666; }
+
+  .progress-bar-bg { background: #e0e0d8; border-radius: 99px; height: 6px; margin-bottom: 1.5rem; }
+  .progress-bar-fill { background: #1D9E75; height: 6px; border-radius: 99px; transition: width 0.4s; }
+
+  .q-card { background: #fff; border: 1px solid #e4e4dc; border-radius: 14px; padding: 1.75rem; }
+  .q-text { font-size: 18px; font-weight: 600; color: #1a1a1a; margin-bottom: 1.25rem; line-height: 1.5; }
+
+  .opt-btn { display: block; width: 100%; text-align: left; background: #f5f5f0; border: 1px solid #ddd; border-radius: 10px; padding: 0.8rem 1rem; margin-bottom: 0.65rem; font-size: 15px; color: #1a1a1a; cursor: pointer; transition: background 0.15s, border-color 0.15s; }
+  .opt-btn:hover:not(:disabled) { background: #ebebе4; border-color: #bbb; }
+  .opt-btn.correct { background: #EAF3DE; border-color: #3B6D11; color: #27500A; font-weight: 600; }
+  .opt-btn.wrong { background: #FCEBEB; border-color: #A32D2D; color: #791F1F; }
+
+  .feedback { font-size: 14px; margin: 0.85rem 0 0; padding: 0.7rem 1rem; border-radius: 10px; display: none; line-height: 1.6; }
+  .feedback.show { display: block; }
+  .feedback.ok { background: #EAF3DE; color: #27500A; }
+  .feedback.no { background: #FCEBEB; color: #791F1F; }
+
+  .next-btn { margin-top: 1rem; padding: 0.7rem 1.6rem; border-radius: 10px; border: 1px solid #ccc; background: #fff; color: #1a1a1a; font-size: 15px; cursor: pointer; display: none; transition: background 0.15s; }
+  .next-btn:hover { background: #f0f0e8; }
+
+  .score-card { text-align: center; padding: 2rem 1rem; }
+  .score-circle { width: 120px; height: 120px; border-radius: 50%; background: #E1F5EE; border: 3px solid #1D9E75; margin: 0 auto 1.5rem; display: flex; flex-direction: column; align-items: center; justify-content: center; }
+  .score-num { font-size: 36px; font-weight: 700; color: #0F6E56; line-height: 1; }
+  .score-denom { font-size: 14px; color: #1D9E75; }
+  .score-msg { font-size: 20px; font-weight: 600; color: #1a1a1a; margin-bottom: 0.5rem; }
+  .score-sub { font-size: 14px; color: #666; margin-bottom: 1.75rem; }
+  .restart-btn { padding: 0.75rem 2.25rem; border-radius: 10px; border: 1px solid #1D9E75; background: #E1F5EE; color: #0F6E56; font-size: 15px; cursor: pointer; font-weight: 600; transition: background 0.15s; }
+  .restart-btn:hover { background: #9FE1CB; }
+
+  .title-screen { text-align: center; }
+  .title-screen h1 { font-size: 26px; font-weight: 700; color: #1a1a1a; margin-bottom: 0.5rem; }
+  .title-screen p { font-size: 15px; color: #555; margin-bottom: 1.75rem; line-height: 1.6; }
+  .start-btn { padding: 0.8rem 2.5rem; border-radius: 10px; border: none; background: #138808; color: #fff; font-size: 16px; font-weight: 600; cursor: pointer; transition: background 0.15s; }
+  .start-btn:hover { background: #0F6E56; }
+</style>
+</head>
+<body>
+<div class="container">
+
+  <!-- Title Screen -->
+  <div class="q-card title-screen" id="title-screen">
+    <div class="flag-bar" style="justify-content:center; margin-bottom:1.25rem;">
+      <div class="flag-seg" style="background:#FF9933; max-width:80px;"></div>
+      <div class="flag-seg" style="background:#ffffff; border:1px solid #ddd; max-width:80px;"></div>
+      <div class="flag-seg" style="background:#138808; max-width:80px;"></div>
+    </div>
+    <h1>India Independence Day Quiz</h1>
+    <p>Test your knowledge about India's glorious journey to freedom.<br>10 questions · Instant feedback · How many can you get right?</p>
+    <button class="start-btn" onclick="startQuiz()">Start Quiz &rarr;</button>
+  </div>
+
+  <!-- Quiz Screen -->
+  <div id="quiz-screen" style="display:none;">
+    <div class="flag-bar">
+      <div class="flag-seg" style="background:#FF9933;"></div>
+      <div class="flag-seg" style="background:#ffffff; border:1px solid #ddd;"></div>
+      <div class="flag-seg" style="background:#138808;"></div>
+    </div>
+    <div class="header-row">
+      <span class="q-label" id="q-label">Question 1 of 10</span>
+      <span class="score-live" id="score-live">Score: 0</span>
+    </div>
+    <div class="progress-bar-bg"><div class="progress-bar-fill" id="prog" style="width:10%;"></div></div>
+    <div class="q-card" id="q-card">
+      <div class="q-text" id="q-text"></div>
+      <div id="options"></div>
+      <div class="feedback" id="feedback"></div>
+      <button class="next-btn" id="next-btn">Next question &rarr;</button>
+    </div>
+  </div>
+
+  <!-- Score Screen -->
+  <div id="score-screen" style="display:none;">
+    <div class="flag-bar">
+      <div class="flag-seg" style="background:#FF9933;"></div>
+      <div class="flag-seg" style="background:#ffffff; border:1px solid #ddd;"></div>
+      <div class="flag-seg" style="background:#138808;"></div>
+    </div>
+    <div class="q-card score-card">
+      <div class="score-circle">
+        <span class="score-num" id="final-score">0</span>
+        <span class="score-denom">/ 10</span>
+      </div>
+      <div class="score-msg" id="score-msg"></div>
+      <div class="score-sub" id="score-sub"></div>
+      <button class="restart-btn" onclick="startQuiz()">Play Again</button>
+    </div>
+  </div>
+
+</div>
+<script>
+const questions = [
+  { q: "On which date did India gain independence from British rule?", opts: ["14 August 1947","15 August 1947","26 January 1950","15 August 1950"], ans: 1, fact: "India became independent on 15 August 1947 at the stroke of midnight." },
+  { q: "Who was the first Prime Minister of independent India?", opts: ["Sardar Vallabhbhai Patel","Rajendra Prasad","Jawaharlal Nehru","Subhas Chandra Bose"], ans: 2, fact: "Jawaharlal Nehru gave his famous 'Tryst with Destiny' speech and became India's first PM." },
+  { q: "At which historic monument does the Prime Minister hoist the flag on Independence Day?", opts: ["India Gate","Rashtrapati Bhavan","Qutub Minar","Red Fort"], ans: 3, fact: "The PM unfurls the national flag at the Red Fort (Lal Qila) in Delhi every year." },
+  { q: "Who designed the Indian National Flag?", opts: ["Rabindranath Tagore","Mahatma Gandhi","Pingali Venkayya","Bhagat Singh"], ans: 2, fact: "Pingali Venkayya designed the flag with the tricolour and the Ashoka Chakra." },
+  { q: "What does the Ashoka Chakra (wheel) in the Indian flag represent?", opts: ["Wheel of progress and dharma","Symbol of peace","Wheel of agriculture","Cycle of seasons"], ans: 0, fact: "The Ashoka Chakra has 24 spokes and symbolises the wheel of dharma (law/progress)." },
+  { q: "Who was the last Viceroy of British India?", opts: ["Lord Curzon","Lord Mountbatten","Lord Wavell","Lord Irwin"], ans: 1, fact: "Lord Louis Mountbatten was the last Viceroy and oversaw the transfer of power in 1947." },
+  { q: "Which document did India officially adopt on 26 January 1950?", opts: ["Indian Penal Code","Constitution of India","Declaration of Independence","Government of India Act"], ans: 1, fact: "India became a republic on 26 January 1950 when the Constitution of India came into force." },
+  { q: "The phrase 'Jai Hind' was popularised by which freedom fighter?", opts: ["Mahatma Gandhi","Jawaharlal Nehru","Subhas Chandra Bose","Lala Lajpat Rai"], ans: 2, fact: "Subhas Chandra Bose popularised 'Jai Hind' as a patriotic slogan for the INA." },
+  { q: "How many spokes does the Ashoka Chakra on the Indian flag have?", opts: ["12","16","24","36"], ans: 2, fact: "The Ashoka Chakra has 24 spokes, representing the 24 hours of a day — constant progress." },
+  { q: "Which country was created alongside India during the 1947 partition?", opts: ["Bangladesh","Pakistan","Sri Lanka","Nepal"], ans: 1, fact: "Pakistan was created as a separate nation on 14 August 1947, one day before India's independence." }
+];
+
+let current = 0, score = 0, answered = false;
+
+function startQuiz() {
+  current = 0; score = 0; answered = false;
+  document.getElementById('title-screen').style.display = 'none';
+  document.getElementById('score-screen').style.display = 'none';
+  document.getElementById('quiz-screen').style.display = 'block';
+  renderQ();
+}
+
+function renderQ() {
+  answered = false;
+  const d = questions[current];
+  document.getElementById('q-label').textContent = 'Question ' + (current+1) + ' of 10';
+  document.getElementById('score-live').textContent = 'Score: ' + score;
+  document.getElementById('prog').style.width = (((current+1)/10)*100) + '%';
+  document.getElementById('q-text').textContent = d.q;
+  const optDiv = document.getElementById('options');
+  optDiv.innerHTML = '';
+  d.opts.forEach(function(o, i) {
+    const btn = document.createElement('button');
+    btn.className = 'opt-btn';
+    btn.textContent = o;
+    btn.onclick = function() { pick(i, btn); };
+    optDiv.appendChild(btn);
+  });
+  const fb = document.getElementById('feedback');
+  fb.className = 'feedback';
+  fb.textContent = '';
+  const nb = document.getElementById('next-btn');
+  nb.style.display = 'none';
+  nb.textContent = current < 9 ? 'Next question \u2192' : 'See my score';
+}
+
+function pick(i, btn) {
+  if (answered) return;
+  answered = true;
+  const d = questions[current];
+  const allBtns = document.querySelectorAll('.opt-btn');
+  allBtns.forEach(function(b) { b.disabled = true; });
+  allBtns[d.ans].classList.add('correct');
+  const fb = document.getElementById('feedback');
+  if (i === d.ans) {
+    score++;
+    btn.classList.add('correct');
+    fb.textContent = '\u2713 Correct! ' + d.fact;
+    fb.className = 'feedback show ok';
+  } else {
+    btn.classList.add('wrong');
+    fb.textContent = '\u2717 Not quite. ' + d.fact;
+    fb.className = 'feedback show no';
+  }
+  document.getElementById('score-live').textContent = 'Score: ' + score;
+  document.getElementById('next-btn').style.display = 'inline-block';
+}
+
+document.getElementById('next-btn').onclick = function() {
+  current++;
+  if (current >= 10) showScore();
+  else renderQ();
+};
+
+function showScore() {
+  document.getElementById('quiz-screen').style.display = 'none';
+  document.getElementById('score-screen').style.display = 'block';
+  document.getElementById('final-score').textContent = score;
+  var msg, sub;
+  if (score === 10) { msg = "Perfect score! Jai Hind!"; sub = "You're a true freedom champion. Incredible!"; }
+  else if (score >= 7) { msg = "Well done, patriot!"; sub = "Excellent knowledge of India's independence history."; }
+  else if (score >= 5) { msg = "Good effort!"; sub = "You know the basics — try again to score higher!"; }
+  else { msg = "Keep learning!"; sub = "India's history is rich — give it another try!"; }
+  document.getElementById('score-msg').textContent = msg;
+  document.getElementById('score-sub').textContent = sub;
+}
+</script>
+</body>
+</html>
